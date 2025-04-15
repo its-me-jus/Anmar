@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft } from 'lucide-react';
 import { useStore } from '../store';
 import type { DialogueStory } from '../types/dialogue';
+import YouTubePlayer from './YouTubePlayer';
+import { getVideoSource } from '../config/videoMapping';
 
 interface DialogueModuleProps {
   story: DialogueStory;
@@ -36,33 +38,49 @@ export const DialogueModule: React.FC<DialogueModuleProps> = ({ story, onComplet
       })
     : null;
 
-  // Set up video time tracking
+  // Check if we should use YouTube for this video
+  const useYouTubeVideo = currentNode?.backgroundVideo 
+    ? getVideoSource(currentNode.backgroundVideo).useYouTube 
+    : false;
+  
+  const youtubeVideoId = currentNode?.backgroundVideo 
+    ? getVideoSource(currentNode.backgroundVideo).source 
+    : null;
+
+  // Handle YouTube video ending
+  const handleYouTubeEnd = () => {
+    // Show options when YouTube video ends
+    setShowOptions(true);
+  };
+
+  // Only set up video time tracking if not using YouTube
   useEffect(() => {
+    // Skip this effect if using YouTube or no video
+    if (useYouTubeVideo || !currentNode?.backgroundVideo) return;
+    
     const video = videoRef.current;
-    if (!video || !currentNode?.backgroundVideo) return;
+    if (!video) return;
 
     // Create path variations for Netlify deployment
     const baseUrl = window.location.origin;
-    const isDevelopment = baseUrl.includes('webcontainer-api.io') || baseUrl.includes('localhost');
+    const isDevelopment = baseUrl.includes('localhost') || baseUrl.includes('127.0.0.1');
     const videoPath = currentNode.backgroundVideo;
     const videoFilename = videoPath.split('/').pop();
     
-    // Try different video paths - use only local paths in development
-    const videoSources = isDevelopment 
+    // Simplified video sources to focus on most reliable paths
+    const videoSources = isDevelopment
       ? [
-          // For development environment - only use local paths
+          // For development environment - use simple paths
           `videos/${videoFilename}`,
-          `/videos/${videoFilename}`,
+          videoPath.startsWith('/') ? videoPath.substring(1) : videoPath,
           videoPath
         ]
       : [
-          // For production (Netlify) environment - can use more options
-          `videos/${videoFilename}`,
-          `/videos/${videoFilename}`,
-          // Only use production URL in production, not in dev (prevents CORS errors)
-          baseUrl.includes('netlify.app') ? `${baseUrl}/videos/${videoFilename}` : null,
+          // For production environment - prioritize patterns that work
+          `videos/${videoFilename}`, // Most reliable on Netlify
+          videoPath.startsWith('/') ? videoPath.substring(1) : videoPath,
           videoPath
-        ].filter(Boolean);
+        ];
     
     console.log(`Environment: ${isDevelopment ? 'Development' : 'Production'}`);
     console.log("Attempting to load video with these paths:", videoSources);
@@ -70,6 +88,8 @@ export const DialogueModule: React.FC<DialogueModuleProps> = ({ story, onComplet
     // Start with first source
     let currentSourceIndex = 0;
     video.src = videoSources[currentSourceIndex];
+    video.muted = true; // Ensure muted for autoplay
+    video.preload = 'metadata'; // Load metadata first for faster initial loading
     video.load();
 
     // Add error handling for video loading
@@ -112,7 +132,7 @@ export const DialogueModule: React.FC<DialogueModuleProps> = ({ story, onComplet
       video.removeEventListener('loadeddata', handleVideoLoaded);
       video.removeEventListener('timeupdate', handleTimeUpdate);
     };
-  }, [currentNode]);
+  }, [currentNode, useYouTubeVideo]);
 
   // Handle dialogue and options visibility based on video time
   useEffect(() => {
@@ -218,28 +238,32 @@ export const DialogueModule: React.FC<DialogueModuleProps> = ({ story, onComplet
       {/* Background Video or Image */}
       {currentNode.backgroundVideo ? (
         <div className="absolute inset-0 z-0">
-          <video 
-            ref={videoRef}
-            className="w-full h-full object-cover"
-            autoPlay
-            playsInline
-            muted
-            onError={(e) => {
-              console.error("Video error:", e);
-              // If video fails to load, we could set a fallback state here
-            }}
-          />
+          {useYouTubeVideo && youtubeVideoId ? (
+            <YouTubePlayer
+              videoId={youtubeVideoId}
+              onEnd={handleYouTubeEnd}
+              autoplay={true}
+              muted={true}
+            />
+          ) : (
+            <video 
+              ref={videoRef}
+              className="w-full h-full object-cover"
+              autoPlay
+              playsInline
+              muted
+              preload="metadata"
+              onError={(e) => {
+                console.error("Video error:", e);
+                // If video fails to load, we still show dialogue options
+                setShowOptions(true);
+              }}
+            />
+          )}
           <div className="absolute inset-0 bg-black/40" /> {/* Lighter overlay since we're removing text */}
         </div>
       ) : (
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
-          style={{
-            backgroundImage: 'url(https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=1920&q=80)',
-          }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/60 to-black/80 backdrop-blur-[1px]" />
-        </div>
+        <div className="absolute inset-0 z-0 bg-gray-900" />
       )}
 
       {/* Navigation */}

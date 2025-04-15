@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '../store';
+import YouTubePlayer from './YouTubePlayer';
+import { getVideoSource } from '../config/videoMapping';
 
 interface VideoSceneProps {
   videoUrl: string;
@@ -36,25 +38,78 @@ export const VideoScene: React.FC<VideoSceneProps> = ({
     buttons: string[];
   }>({ text: [], buttons: [] });
   const [loadAttempts, setLoadAttempts] = useState(0);
+  
+  // Check if we should use YouTube
+  const { useYouTube, source } = getVideoSource(videoUrl);
 
+  // If using YouTube, we handle things differently
+  if (useYouTube) {
+    return (
+      <div className="relative w-full h-screen bg-black">
+        <YouTubePlayer
+          videoId={source}
+          onEnd={onComplete}
+          autoplay={true}
+          muted={true}
+        />
+        
+        {/* Overlay Container for YouTube */}
+        <div className="absolute inset-0 flex flex-col justify-between p-8 pointer-events-none">
+          {/* Text Overlays */}
+          <div className="w-full flex flex-col items-center">
+            <AnimatePresence>
+              {overlays?.text?.map((textOverlay) => (
+                <motion.div
+                  key={textOverlay.content}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className={`
+                    max-w-3xl bg-black/70 rounded-lg p-4 mb-4 text-white text-center
+                    ${textOverlay.position === 'top' ? 'mt-0' : 'mt-auto'}
+                    ${textOverlay.position === 'bottom' ? 'mb-0' : 'mb-auto'}
+                    ${textOverlay.position === 'center' ? 'my-auto' : ''}
+                  `}
+                >
+                  {textOverlay.content}
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+          
+          {/* Skip Button (remains clickable) */}
+          <div className="flex justify-end pointer-events-auto">
+            <button 
+              onClick={onComplete}
+              className="px-4 py-2 bg-blue-600/70 rounded hover:bg-blue-700 text-white transition-colors"
+            >
+              Skip
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // The rest of the original component for local videos
   // Try different video paths
   const baseUrl = window.location.origin;
   const isDevelopment = baseUrl.includes('localhost') || baseUrl.includes('127.0.0.1');
   
-  // Create more effective path variations for Netlify deployment
+  // Simplified path resolution strategy that focuses on the most likely to work paths
   const videoSources = isDevelopment
     ? [
-        // Development environment - simpler paths
+        // For development environment - use simple paths
         `videos/${videoUrl.split('/').pop()}`,
         videoUrl.startsWith('/') ? videoUrl.substring(1) : videoUrl,
         videoUrl
       ]
     : [
-        // Production environment (Netlify) - prioritize working patterns
+        // For production environment (Netlify) - prioritize patterns that work
         `videos/${videoUrl.split('/').pop()}`, // This pattern works most reliably on Netlify
         videoUrl.startsWith('/') ? videoUrl.substring(1) : videoUrl,
         videoUrl,
-        // Last resort - full URL with origin
+        // Only use full URL as last resort
         `${baseUrl}/videos/${videoUrl.split('/').pop()}`
       ];
   
@@ -65,7 +120,7 @@ export const VideoScene: React.FC<VideoSceneProps> = ({
   console.log('Attempting to load video with these paths:', filteredSources);
 
   useEffect(() => {
-    // Set a LONGER timeout to detect video loading issues (10 seconds instead of 5)
+    // Shorter timeout (6 seconds) to detect video loading issues
     const loadTimeout = setTimeout(() => {
       if (!videoLoaded && !loadError && loadAttempts < filteredSources.length - 1) {
         console.error('Video loading timeout:', filteredSources[loadAttempts]);
@@ -74,7 +129,7 @@ export const VideoScene: React.FC<VideoSceneProps> = ({
         setLoadError(true);
         if (onError) onError();
       }
-    }, 10000); // 10 second timeout - give more time for videos to load
+    }, 6000); // 6 second timeout - still gives enough time for videos to load
 
     return () => clearTimeout(loadTimeout);
   }, [videoLoaded, loadError, loadAttempts, filteredSources, onError]);
@@ -216,6 +271,7 @@ export const VideoScene: React.FC<VideoSceneProps> = ({
         autoPlay
         playsInline
         muted
+        preload="metadata"
         crossOrigin="anonymous"
         onPlay={() => setIsPlaying(true)}
       />

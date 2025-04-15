@@ -190,18 +190,18 @@ export const StoryQuiz: React.FC = () => {
         ? [
             // For development - only use local paths to avoid CORS errors
             'videos/WelcomeUpdate.mp4',
-            'videos/welcome.mp4',
+            'videos/welcome_dialogue.mp4',
             // Fallback only as last resort
-            'https://storage.googleapis.com/webfundamentals-assets/videos/chrome.mp4'
+            'videos/welcome.mp4'
           ]
         : [
             // For Netlify production environment
             'videos/WelcomeUpdate.mp4',
-            'videos/welcome.mp4',
+            'videos/welcome_dialogue.mp4',
             // If we detected Netlify, add absolute URL as well (only in production)
             ...(netlifyDomain ? [`${netlifyDomain}/videos/WelcomeUpdate.mp4`] : []),
             // Fallback only as last resort
-            'https://storage.googleapis.com/webfundamentals-assets/videos/chrome.mp4'
+            'videos/welcome.mp4'
           ];
       
       console.log('Setting up video sequence with paths:', videos);

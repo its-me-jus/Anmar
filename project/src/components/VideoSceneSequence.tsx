@@ -16,7 +16,7 @@ const FALLBACK_VIDEOS = [
   'videos/welcome.mp4'
 ];
 
-// Preload utility function
+// Improved preload utility function
 const preloadVideo = (src: string): Promise<boolean> => {
   return new Promise((resolve) => {
     // Skip preloading for non-essential fallbacks
@@ -28,23 +28,35 @@ const preloadVideo = (src: string): Promise<boolean> => {
     
     const video = document.createElement('video');
     
+    // Add muted attribute to help with autoplay restrictions
+    video.muted = true;
+    // Only load metadata first for better performance
+    video.preload = 'metadata';
+    
+    // Listen for metadata loaded - this is faster than waiting for all data
+    video.onloadedmetadata = () => {
+      console.log(`Successfully loaded metadata for video: ${src}`);
+      // At this point, we know the video exists and is accessible
+      resolve(true);
+    };
+    
     video.onloadeddata = () => {
       console.log(`Successfully preloaded video: ${src}`);
       resolve(true);
     };
     
     video.onerror = () => {
-      console.warn(`Failed to preload video: ${src}`);
+      console.warn(`Failed to preload video: ${src}`, video.error?.message || 'Unknown error');
       resolve(false);
     };
     
-    // Set a timeout to prevent waiting too long
+    // Reduce timeout to 3 seconds to prevent UI blocking
     setTimeout(() => {
       if (video.readyState === 0) {
         console.warn(`Preload timeout for: ${src}`);
         resolve(false);
       }
-    }, 5000);
+    }, 3000);
     
     video.src = src;
     video.load();
@@ -65,39 +77,41 @@ const VideoSceneSequence: React.FC<VideoSceneSequenceProps> = ({ onComplete, onE
   const [currentFallbackVideo, setCurrentFallbackVideo] = useState<string | null>(null);
   const [preloadStatus, setPreloadStatus] = useState<{ [key: string]: boolean }>({});
 
-  // Preload videos when component mounts - with reduced requests
+  // Improved preload strategy with progressive loading
   useEffect(() => {
     if (videoUrls.length > 0) {
       const preloadAllVideos = async () => {
         console.log('Starting video preload...');
         const results: { [key: string]: boolean } = {};
         
-        // Only preload the first video and first fallback to reduce requests
+        // Only preload the first video to reduce resource usage
         const mainVideo = videoUrls[0];
-        const mainFallback = FALLBACK_VIDEOS[0];
         
         try {
-          // Try primary video
+          // Try primary video first
+          console.log(`Attempting to preload: ${mainVideo}`);
           const success = await preloadVideo(mainVideo);
           results[mainVideo] = success;
           
-          // Only try fallback if primary failed
-          if (!success) {
-            const fallbackSuccess = await preloadVideo(mainFallback);
-            results[mainFallback] = fallbackSuccess;
+          // If primary fails, try the first fallback immediately
+          if (!success && FALLBACK_VIDEOS.length > 0) {
+            console.log(`Primary video failed, trying fallback: ${FALLBACK_VIDEOS[0]}`);
+            const fallbackSuccess = await preloadVideo(FALLBACK_VIDEOS[0]);
+            results[FALLBACK_VIDEOS[0]] = fallbackSuccess;
           }
           
           console.log('Preload results:', results);
           setPreloadStatus(results);
           
-          // Check if any video preloaded successfully
+          // Any success is good enough to proceed
           const anySuccess = Object.values(results).some(result => result === true);
           if (!anySuccess) {
             console.warn('None of the videos preloaded successfully');
-            setVideoError(true);
+            // Don't set error immediately - let the VideoScene component try with its own path resolution
           }
         } catch (err) {
           console.error('Error during preload:', err);
+          // Continue anyway - the VideoScene will handle fallbacks
         }
       };
       
@@ -181,7 +195,7 @@ const VideoSceneSequence: React.FC<VideoSceneSequenceProps> = ({ onComplete, onE
   const handleVideoError = () => {
     console.error(`Error loading video: ${currentVideoUrl}`);
     
-    // Try next fallback
+    // Try next fallback with a more aggressive approach
     if (currentFallbackVideo) {
       // We're already using a fallback, try the next one in FALLBACK_VIDEOS
       const nextFallbackIndex = fallbackIndex + 1;
@@ -191,23 +205,24 @@ const VideoSceneSequence: React.FC<VideoSceneSequenceProps> = ({ onComplete, onE
         setCurrentFallbackVideo(FALLBACK_VIDEOS[nextFallbackIndex]);
         return;
       }
-    } else if (videoUrls.length > 1) {
-      // Try the next video in the sequence if available
-      const nextVideoIndex = currentVideoIndex + 1;
-      if (nextVideoIndex < videoUrls.length) {
-        console.log(`Trying next video in sequence: ${videoUrls[nextVideoIndex]}`);
-        setCurrentFallbackVideo(videoUrls[nextVideoIndex]);
-        return;
-      }
     } else {
-      // Try the first fallback
+      // Try the first fallback immediately
       console.log(`Trying first fallback video: ${FALLBACK_VIDEOS[0]}`);
       setFallbackIndex(0);
       setCurrentFallbackVideo(FALLBACK_VIDEOS[0]);
       return;
     }
     
-    // If all fallbacks failed, trigger error callback
+    // If all fallbacks failed, try proceeding with the next video if available
+    if (videoUrls.length > 1 && currentVideoIndex < videoUrls.length - 1) {
+      console.log(`All fallbacks failed. Skipping to next video in sequence.`);
+      nextVideo();
+      setFallbackIndex(-1);
+      setCurrentFallbackVideo(null);
+      return;
+    }
+    
+    // If all else fails, trigger error callback
     setVideoError(true);
     if (onError) {
       onError();
