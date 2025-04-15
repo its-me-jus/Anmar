@@ -21,6 +21,13 @@ export const videoMapping: Record<string, string> = {
   '/videos/experience5.mp4': 'pQj4AjwqH5g',    // Experience 5 video
   '/videos/experience6.mp4': '0k_PCvtxvqM',    // Experience 6 video
   '/videos/experience7.mp4': '-qPE2BAgcFg',    // Using WelcomeUpdate as fallback
+  
+  // Lesson videos
+  '/videos/lesson_1.mp4': 'NeRYYFYB7Hk',      // Understanding Sexual Harassment
+  '/videos/lesson_2.mp4': 'JwSfRjDoLP0',       // Quid Pro Quo Harassment
+  '/videos/lesson_3.mp4': 'f6VZ27m_aso',       // Hostile Work Environment
+  '/videos/lesson_8.mp4': 'aSEpHn-9Q9o',       // Responding to Uncomfortable Situations
+  '/videos/lesson_9.mp4': 'jAMWiwOeW6k',       // Bystander Intervention
 };
 
 /**

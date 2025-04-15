@@ -6,6 +6,7 @@ import { getLessonContent } from '../lib/lessons';
 import { useStore } from '../store';
 import AudioManager from '../utils/audio';
 import { ElevenLabsService } from '../utils/elevenLabsService';
+import { VideoScene } from './VideoScene';
 
 interface LessonContentProps {
   question: Question;
@@ -62,6 +63,7 @@ const LessonContent: React.FC<LessonContentProps> = ({
   const backgroundImage = getBackgroundImage(question.category || 'default');
   const categoryColor = getCategoryColor(question.category || 'default');
   const [showTeacherTip, setShowTeacherTip] = useState(false);
+  const [showVideo, setShowVideo] = useState(!!content.videoId); // Show video if available
   const audioManager = AudioManager.getInstance();
   const elevenLabsService = ElevenLabsService.getInstance();
 
@@ -152,6 +154,37 @@ const LessonContent: React.FC<LessonContentProps> = ({
   
   // Get a tip for this specific question
   const teacherTip = getTeacherTip(question.category);
+
+  // If we have a videoId and should show the video, render the VideoScene component
+  if (showVideo && content.videoId) {
+    return (
+      <VideoScene
+        videoUrl={`videos/lesson_${questionNumber}.mp4`}
+        onComplete={() => setShowVideo(false)} // When video completes, show lesson content
+        overlays={{
+          text: [
+            {
+              content: content.title,
+              position: "top",
+              timing: { start: 0, end: 3 }
+            },
+            {
+              content: content.description,
+              position: "center",
+              timing: { start: 3, end: 6 }
+            }
+          ],
+          buttons: [
+            {
+              text: "Continue to Lesson",
+              timing: { start: 8 },
+              action: "COMPLETE"
+            }
+          ]
+        }}
+      />
+    );
+  }
 
   return (
     <motion.div

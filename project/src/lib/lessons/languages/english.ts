@@ -4,6 +4,7 @@ export const englishLessons: Record<number, LessonContent> = {
   1: {
     title: "Understanding Sexual Harassment",
     description: "Learn to identify what constitutes sexual harassment in the workplace.",
+    videoId: 'NeRYYFYB7Hk',
     story: {
       scenario: "You notice a colleague seems uncomfortable when certain team members make comments about their appearance.",
       challenge: "Recognizing when behavior crosses the line from friendly to inappropriate.",
@@ -33,6 +34,7 @@ export const englishLessons: Record<number, LessonContent> = {
   2: {
     title: "Quid Pro Quo Harassment",
     description: "Understanding the exchange-based form of sexual harassment.",
+    videoId: 'JwSfRjDoLP0',
     story: {
       scenario: "A manager hints at giving special treatment to an employee who agrees to meet outside of work for 'personal time'.",
       challenge: "Identifying when professional benefits are improperly tied to sexual or romantic favors.",
@@ -62,6 +64,7 @@ export const englishLessons: Record<number, LessonContent> = {
   3: {
     title: "Hostile Work Environment",
     description: "Understanding how repeated behaviors can create an intimidating atmosphere.",
+    videoId: 'f6VZ27m_aso',
     story: {
       scenario: "A department has normalized sexual jokes and inappropriate comments, causing some team members to feel uncomfortable coming to work.",
       challenge: "Recognizing when workplace culture crosses the line into creating a hostile environment.",
@@ -207,6 +210,7 @@ export const englishLessons: Record<number, LessonContent> = {
   8: {
     title: "Responding to Uncomfortable Situations",
     description: "Learning effective responses when faced with potentially harassing behavior.",
+    videoId: 'aSEpHn-9Q9o',
     story: {
       scenario: "A colleague regularly makes comments with sexual undertones that make you uncomfortable.",
       challenge: "Finding the confidence to address the situation directly while maintaining professional relationships.",
@@ -236,6 +240,7 @@ export const englishLessons: Record<number, LessonContent> = {
   9: {
     title: "Bystander Intervention",
     description: "Understanding how witnesses can help prevent and address sexual harassment.",
+    videoId: 'jAMWiwOeW6k',
     story: {
       scenario: "You observe a colleague making unwelcome advances toward another team member who appears uncomfortable.",
       challenge: "Deciding when and how to intervene in situations that don't directly involve you.",
