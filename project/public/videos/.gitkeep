@@ -1,0 +1,16 @@
+# Video Files Directory
+
+This directory contains video files for the training application.
+
+If videos are not loading, please ensure:
+1. The video files are properly placed in this directory
+2. The file names match those referenced in the code
+3. The video format is compatible with web browsers (MP4 is recommended)
+
+## Default Videos
+- welcome.mp4: Introduction video
+- definition.mp4: Explanation of key concepts
+- experience1.mp4 through experience7.mp4: Scenario videos
+
+## Fallback Mechanism
+The application includes a fallback mechanism that will try multiple paths and formats if a video fails to load.
