@@ -39,36 +39,27 @@ export const VideoScene: React.FC<VideoSceneProps> = ({
 
   // Try different video paths
   const baseUrl = window.location.origin;
-  const publicPath = `${baseUrl}/`;
-  const isDevelopment = baseUrl.includes('webcontainer-api.io') || baseUrl.includes('localhost');
+  const isDevelopment = baseUrl.includes('localhost') || baseUrl.includes('127.0.0.1');
   
-  // Create path variations for Netlify deployment
+  // Create more effective path variations for Netlify deployment
   const videoSources = isDevelopment
     ? [
-        // For development environment - only use local paths to avoid CORS errors
-        videoUrl.startsWith('/') ? videoUrl.substring(1) : videoUrl,
-        videoUrl.startsWith('/') ? videoUrl : `/${videoUrl}`,
+        // Development environment - simpler paths
         `videos/${videoUrl.split('/').pop()}`,
-        // Fallback to a known working video
-        'https://storage.googleapis.com/webfundamentals-assets/videos/chrome.mp4'
+        videoUrl.startsWith('/') ? videoUrl.substring(1) : videoUrl,
+        videoUrl
       ]
     : [
-        // For production environment (Netlify) - can use all path variations
-        // Hard-coded netlify base URL only if we're in production on netlify
-        baseUrl.includes('netlify.app') ? `${baseUrl}/videos/${videoUrl.split('/').pop()}` : null,
-        // Plain filename variations (often works best with Netlify)
-        `videos/${videoUrl.split('/').pop()}`,
-        // Simple paths that often work with Netlify
-        videoUrl,
+        // Production environment (Netlify) - prioritize working patterns
+        `videos/${videoUrl.split('/').pop()}`, // This pattern works most reliably on Netlify
         videoUrl.startsWith('/') ? videoUrl.substring(1) : videoUrl,
-        // Try with leading slash
-        videoUrl.startsWith('/') ? videoUrl : `/${videoUrl}`,
-        // Fallback to a known working video
-        'https://storage.googleapis.com/webfundamentals-assets/videos/chrome.mp4'
+        videoUrl,
+        // Last resort - full URL with origin
+        `${baseUrl}/videos/${videoUrl.split('/').pop()}`
       ];
   
-  // Filter out nulls and limit to 5 paths to prevent excessive retries
-  const filteredSources = videoSources.filter(Boolean).slice(0, 5);
+  // Filter out nulls and limit to 3 paths to prevent excessive retries
+  const filteredSources = videoSources.filter(Boolean).slice(0, 3);
   
   console.log(`Environment: ${isDevelopment ? 'Development' : 'Production'}`);
   console.log('Attempting to load video with these paths:', filteredSources);
@@ -224,6 +215,7 @@ export const VideoScene: React.FC<VideoSceneProps> = ({
         className="w-full h-full object-contain"
         autoPlay
         playsInline
+        muted
         crossOrigin="anonymous"
         onPlay={() => setIsPlaying(true)}
       />

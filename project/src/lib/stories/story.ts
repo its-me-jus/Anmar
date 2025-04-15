@@ -10,7 +10,7 @@ export const testStory: DialogueStory = {
       id: 'mentor',
       name: 'Rum Charles',
       role: 'mentor' as const,
-      avatar: '/images/rum_charles.jpg',
+      avatar: '/avatars/rum_charles.png',
       personality: {
         traits: ['engaging', 'empathetic', 'professional'],
         background: 'Training Specialist with 12 years of experience at Anwar Group',
