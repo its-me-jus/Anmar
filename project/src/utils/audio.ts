@@ -16,37 +16,37 @@ const systemVoices: Record<Language, SystemVoice[]> = {
     {
       id: 'welcome',
       text: "Welcome to your workplace training! I'll be your virtual instructor today.",
-      file: "audio/system/en/welcome.mp3"
+      file: "voices/questions/en/correct_general.mp3"
     },
     {
       id: 'start_quiz',
       text: "Great! Let's begin the quiz.",
-      file: "audio/system/en/start_quiz.mp3"
+      file: "voices/questions/en/correct_general.mp3"
     },
     {
       id: 'next_question',
       text: "Moving on to the next question...",
-      file: "audio/system/en/next_question.mp3"
+      file: "voices/questions/en/correct_general.mp3"
     },
     {
       id: 'correct_answer',
       text: "Excellent work! That's the correct answer.",
-      file: "audio/system/en/correct.mp3"
+      file: "voices/questions/en/correct_general.mp3"
     },
     {
       id: 'incorrect_answer',
       text: "Not quite right, but don't worry!",
-      file: "audio/system/en/incorrect.mp3"
+      file: "voices/questions/en/incorrect_general.mp3"
     },
     {
       id: 'quiz_complete',
       text: "Congratulations! You've completed the quiz.",
-      file: "audio/system/en/complete.mp3"
+      file: "voices/questions/en/correct_wellDone.mp3"
     },
     {
       id: 'language_fallback',
       text: "I'm still learning to speak that language fluently!",
-      file: "audio/system/en/language_fallback.mp3"
+      file: "voices/questions/en/incorrect_general.mp3"
     }
   ],
   Arabic: [],

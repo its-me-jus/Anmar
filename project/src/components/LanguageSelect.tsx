@@ -192,7 +192,7 @@ export const LanguageSelect: React.FC = () => {
       {/* Content */}
       <div className="relative min-h-screen flex items-center justify-center p-4">
         <div className="max-w-6xl w-full">
-          <div className="flex justify-between items-center mb-8">
+          <div className="flex justify-center items-center mb-8">
             <div className="flex items-center gap-3">
               <Globe className="w-8 h-8 text-white" />
               <h2 className="text-3xl font-bold text-white">
@@ -203,46 +203,6 @@ export const LanguageSelect: React.FC = () => {
                     : "Select Your Language"
                 }
               </h2>
-            </div>
-            <div className="flex items-center gap-4">
-              {!showAdvancedSettings && (
-                <>
-                  <button
-                    onClick={() => setShowAdvancedSettings(true)}
-                    className="flex items-center gap-2 text-white/80 hover:text-white transition-colors"
-                    disabled={user?.isStoryMode}
-                  >
-                    <Languages className="w-5 h-5" />
-                    <span className={user?.isStoryMode ? "text-white/40" : ""}>Advanced Language Settings</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      audioManager.playSystemVoice('welcome', 'English');
-                      setQuizState('VOICE_CHECK');
-                    }}
-                    className="flex items-center gap-2 text-white/80 hover:text-white transition-colors"
-                  >
-                    <Volume2 className="w-5 h-5" />
-                    <span>Check Voices</span>
-                  </button>
-                  <button
-                    onClick={() => setQuizState('MODE_SELECT')}
-                    className="flex items-center gap-2 text-white/80 hover:text-white transition-colors"
-                  >
-                    <Home className="w-5 h-5" />
-                    <span>Change Training Mode</span>
-                  </button>
-                </>
-              )}
-              {showAdvancedSettings && (
-                <button
-                  onClick={() => setShowAdvancedSettings(false)}
-                  className="flex items-center gap-2 text-white/80 hover:text-white transition-colors"
-                >
-                  <Home className="w-5 h-5" />
-                  <span>Back to Simple Selection</span>
-                </button>
-              )}
             </div>
           </div>
 
@@ -269,28 +229,6 @@ export const LanguageSelect: React.FC = () => {
             </div>
           )}
           
-          {/* Language grid with big, beautiful language cards */}
-          {!showAdvancedSettings && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-              {languages
-                .filter(language => !user?.isStoryMode || language === 'English')
-                .map((language) => (
-                  <button
-                    key={language}
-                    onClick={() => handleLanguageSelect(language)}
-                    className={`
-                      flex items-center gap-4 p-4 rounded-xl transition-all
-                      ${language === user?.language 
-                        ? 'bg-blue-600 text-white' 
-                        : 'bg-white/5 hover:bg-white/10 text-white'}
-                    `}
-                  >
-                    {/* ... existing content ... */}
-                  </button>
-                ))}
-            </div>
-          )}
-          
           {/* Language grid or advanced settings */}
           {showAdvancedSettings ? (
             <LanguageSettings onBack={() => setShowAdvancedSettings(false)} />
@@ -314,6 +252,17 @@ export const LanguageSelect: React.FC = () => {
               </div>
             )
           )}
+          
+          {/* Mode change button at bottom */}
+          <div className="flex justify-center mt-6">
+            <button
+              onClick={() => setQuizState('MODE_SELECT')}
+              className="flex items-center gap-2 text-white/80 hover:text-white transition-colors border border-white/20 rounded-lg px-4 py-2 hover:bg-white/10"
+            >
+              <Home className="w-5 h-5" />
+              <span>Change Training Mode</span>
+            </button>
+          </div>
         </div>
       </div>
     </motion.div>

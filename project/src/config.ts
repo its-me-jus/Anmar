@@ -20,12 +20,12 @@ export const elevenlabsConfig = {
   
   // Default voice IDs per language
   voiceIds: {
-    English: 'IKne3meq5aSn9XLyUdCD', // Charlie's voice
+    English: 'z9fAnlkpzviPz146aGWa', // Daniel's voice (Australian accent)
     Spanish: '29vD33N1CtxCmqQRPOHJ', // Mateo - male
     Arabic: 'IES4nrmZdUBHByLBde0P',  // Updated voice ID
     Mandarin: 'ByhETIclHirOlWnWKhHc', // Primary Mandarin voice
     Vietnamese: 'foH7s9fX31wFFH2yqrFa', // Vietnamese voice
-    Cantonese: 'EXAVITQu4vr4xnSDxMaL', // Using English voice as fallback
+    Cantonese: 'z9fAnlkpzviPz146aGWa', // Using Australian voice as fallback
     Punjabi: 'SZfY4K69FwXus87eayHK', // Using Hindi as fallback
     Greek: 'cuab90umcstNgL8U7orz', // Greek voice
     Italian: 'uScy1bXtKz8vPzfdFsFw', // Italian voice

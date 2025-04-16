@@ -14,7 +14,7 @@ interface ElevenLabsOptions {
 }
 
 // Default settings for ElevenLabs API
-const DEFAULT_VOICE_ID = 'IKne3meq5aSn9XLyUdCD'; // Charlie's voice (Australian accent)
+const DEFAULT_VOICE_ID = 'z9fAnlkpzviPz146aGWa'; // Daniel (Australian accent) instead of Charlie
 const DEFAULT_MODEL_ID = 'eleven_monolingual_v1';
 
 // IndexedDB configuration
@@ -36,12 +36,12 @@ export class ElevenLabsService {
   
   // Voices for different languages
   private languageVoices: Record<Language, string> = {
-    'English': 'IKne3meq5aSn9XLyUdCD', // Charlie's voice (Australian accent)
+    'English': 'z9fAnlkpzviPz146aGWa', // Daniel (Australian accent) instead of Charlie
     'Spanish': '29vD33N1CtxCmqQRPOHJ', // Mateo
     'Mandarin': 'ByhETIclHirOlWnWKhHc', // Primary Mandarin voice
     'Arabic': 'IES4nrmZdUBHByLBde0P', // Arabic voice
     'Vietnamese': 'foH7s9fX31wFFH2yqrFa', // Vietnamese voice
-    'Cantonese': 'IKne3meq5aSn9XLyUdCD', // Using English voice as fallback
+    'Cantonese': 'z9fAnlkpzviPz146aGWa', // Using Australian voice as fallback
     'Punjabi': 'SZfY4K69FwXus87eayHK', // Using Hindi voice as fallback
     'Greek': 'cuab90umcstNgL8U7orz', // Greek voice
     'Italian': 'uScy1bXtKz8vPzfdFsFw', // Italian voice
@@ -52,7 +52,7 @@ export class ElevenLabsService {
   // Secondary fallback voices for specific languages
   private fallbackVoices: Partial<Record<Language, string[]>> = {
     'Mandarin': ['Ixmp8zKRajBp10jLtsrq'], // Secondary Mandarin voice
-    'Vietnamese': ['IKne3meq5aSn9XLyUdCD'] // English fallback for Vietnamese
+    'Vietnamese': ['z9fAnlkpzviPz146aGWa'] // Australian fallback for Vietnamese
   };
 
   private constructor() {
