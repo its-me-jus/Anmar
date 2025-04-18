@@ -63,9 +63,33 @@ const LessonContent: React.FC<LessonContentProps> = ({
   const backgroundImage = getBackgroundImage(question.category || 'default');
   const categoryColor = getCategoryColor(question.category || 'default');
   const [showTeacherTip, setShowTeacherTip] = useState(false);
-  const [showVideo, setShowVideo] = useState(!!content.videoId); // Show video if available
+  const [showVideo, setShowVideo] = useState(true);
   const audioManager = AudioManager.getInstance();
   const elevenLabsService = ElevenLabsService.getInstance();
+
+  // Log when lesson content loads
+  useEffect(() => {
+    console.log("Preloading question and options while user reads lesson...");
+    // Preload the next question's options while user is reading lesson
+    if (user?.language) {
+      // Preload options
+      question.options.forEach((option, index) => {
+        const optionText = `Option ${index + 1}: ${option.substring(0, 15)}`;
+        audioManager.preloadAudio(optionText, user.language);
+      });
+      
+      // Preload feedback sounds
+      audioManager.preloadAudio('', user.language, {
+        type: 'system',
+        systemVoiceId: 'correct_answer'
+      });
+      
+      audioManager.preloadAudio('', user.language, {
+        type: 'system',
+        systemVoiceId: 'incorrect_answer'
+      });
+    }
+  }, [question, user?.language, audioManager]);
 
   // Add useEffect for automatic audio playback
   useEffect(() => {
@@ -81,40 +105,6 @@ const LessonContent: React.FC<LessonContentProps> = ({
 
     playLessonAudio();
   }, [question.text, user?.language]);
-
-  // Add preloading for question options
-  useEffect(() => {
-    if (!user) return;
-    
-    // Use user's voice language if available, otherwise fall back to content language
-    const speechLanguage = user.voiceLanguage || user.language;
-    
-    // Wait a bit to ensure current lesson audio loads first
-    const timer = setTimeout(() => {
-      console.log('Preloading question and options while user reads lesson...');
-      
-      // Preload the question options
-      question.options.forEach((option, index) => {
-        audioManager.preloadAudio(
-          `Option ${index + 1}: ${option}`, 
-          speechLanguage
-        );
-      });
-      
-      // Preload feedback audio for the question
-      audioManager.preloadAudio('', speechLanguage, { 
-        type: 'system',
-        systemVoiceId: 'correct_answer'
-      });
-      
-      audioManager.preloadAudio('', speechLanguage, { 
-        type: 'system',
-        systemVoiceId: 'incorrect_answer'
-      });
-    }, 3000); // Longer delay to ensure current lesson audio is processed first
-    
-    return () => clearTimeout(timer);
-  }, [question, user]);
 
   // Helper function to get a random tip based on question category
   const getTeacherTip = (category?: string) => {
@@ -155,12 +145,15 @@ const LessonContent: React.FC<LessonContentProps> = ({
   // Get a tip for this specific question
   const teacherTip = getTeacherTip(question.category);
 
-  // If we have a videoId and should show the video, render the VideoScene component
   if (showVideo && content.videoId) {
+    console.log('Rendering YouTube video with ID:', content.videoId);
     return (
       <VideoScene
-        videoUrl={`videos/lesson_${questionNumber}.mp4`}
-        onComplete={() => setShowVideo(false)} // When video completes, show lesson content
+        videoUrl={content.videoId}
+        onComplete={() => {
+          console.log('Video completed, setting showVideo to false');
+          setShowVideo(false);
+        }}
         overlays={{
           text: [
             {

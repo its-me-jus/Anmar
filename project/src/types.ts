@@ -84,7 +84,7 @@ export const characters: Character[] = [
   }
 ];
 
-export type QuizState = 'HOME' | 'SIGNUP' | 'MODE_SELECT' | 'LANGUAGE' | 'QUIZ' | 'RESULTS' | 'LOCKED' | 'STORY' | 'END_STORY' | 'DIALOGUE';
+export type QuizState = 'HOME' | 'SIGNUP' | 'MODE_SELECT' | 'LANGUAGE' | 'QUIZ' | 'RESULTS' | 'LOCKED' | 'STORY' | 'END_STORY' | 'DIALOGUE' | 'LESSONS';
 
 export interface Achievement {
   id: string;

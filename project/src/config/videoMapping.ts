@@ -80,21 +80,29 @@ export function getYouTubeIdForVideo(localPath: string): string | null {
  * Can be used to conditionally use YouTube instead of local video
  */
 export function shouldUseYouTube(videoPath: string): boolean {
-  // You can implement logic here to decide when to use YouTube
-  // For now, always use YouTube if a mapping exists
-  return !!getYouTubeIdForVideo(videoPath);
+  // Check if the path is a YouTube video ID (11 characters)
+  return videoPath.length === 11 && /^[a-zA-Z0-9_-]{11}$/.test(videoPath);
 }
 
 /**
  * Returns either a YouTube video ID or the original path
- * based on whether a YouTube mapping exists
+ * based on whether it's a YouTube ID or not
  */
 export function getVideoSource(videoPath: string): { useYouTube: boolean; source: string } {
-  const youtubeId = getYouTubeIdForVideo(videoPath);
-  
-  if (youtubeId) {
-    return { useYouTube: true, source: youtubeId };
+  // Check if this looks like a YouTube video ID (11 characters, alphanumeric with - and _)
+  if (videoPath && videoPath.length === 11 && /^[a-zA-Z0-9_-]{11}$/.test(videoPath)) {
+    console.log(`Detected YouTube video ID: ${videoPath}`);
+    return { useYouTube: true, source: videoPath };
   }
   
+  // If it's a YouTube URL, extract the ID
+  const ytId = getYouTubeId(videoPath);
+  if (ytId) {
+    console.log(`Extracted YouTube ID from URL: ${ytId}`);
+    return { useYouTube: true, source: ytId };
+  }
+  
+  // Not a YouTube video, use as local path
+  console.log(`Using local video path: ${videoPath}`);
   return { useYouTube: false, source: videoPath };
 } 

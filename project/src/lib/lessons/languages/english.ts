@@ -4,7 +4,7 @@ export const englishLessons: Record<number, LessonContent> = {
   1: {
     title: "Understanding Sexual Harassment",
     description: "Learn to identify what constitutes sexual harassment in the workplace.",
-    videoId: 'NeRYYFYB7Hk',
+    videoId: 'AaC1DvMOqYY',
     story: {
       scenario: "You notice a colleague seems uncomfortable when certain team members make comments about their appearance.",
       challenge: "Recognizing when behavior crosses the line from friendly to inappropriate.",
@@ -34,7 +34,7 @@ export const englishLessons: Record<number, LessonContent> = {
   2: {
     title: "Quid Pro Quo Harassment",
     description: "Understanding the exchange-based form of sexual harassment.",
-    videoId: 'JwSfRjDoLP0',
+    videoId: 'wTRsDmLLfvw',
     story: {
       scenario: "A manager hints at giving special treatment to an employee who agrees to meet outside of work for 'personal time'.",
       challenge: "Identifying when professional benefits are improperly tied to sexual or romantic favors.",
@@ -64,7 +64,7 @@ export const englishLessons: Record<number, LessonContent> = {
   3: {
     title: "Hostile Work Environment",
     description: "Understanding how repeated behaviors can create an intimidating atmosphere.",
-    videoId: 'f6VZ27m_aso',
+    videoId: 'ZV4gkk6wkO0',
     story: {
       scenario: "A department has normalized sexual jokes and inappropriate comments, causing some team members to feel uncomfortable coming to work.",
       challenge: "Recognizing when workplace culture crosses the line into creating a hostile environment.",

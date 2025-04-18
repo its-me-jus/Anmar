@@ -168,128 +168,30 @@ export const StoryQuiz: React.FC = () => {
   };
 
   const handleStartStory = () => {
-    try {
-      // Ensure we're using English for Story Mode
-      if (user && user.language !== 'English') {
-        setUser({
-          ...user,
-          language: 'English'
-        });
-      }
-      
-      // Get the base URL for the application
-      const baseUrl = window.location.origin;
-      const netlifyDomain = baseUrl.includes('netlify.app') ? baseUrl : null;
-      const isDevelopment = baseUrl.includes('webcontainer-api.io') || baseUrl.includes('localhost');
-      
-      console.log(`Environment: ${isDevelopment ? 'Development' : 'Production'}`);
-      console.log("Base URL detected:", baseUrl);
-      
-      // Configure and show video sequence with proper path
-      const videos = isDevelopment
-        ? [
-            // For development - only use local paths to avoid CORS errors
-            'videos/WelcomeUpdate.mp4',
-            'videos/welcome_dialogue.mp4',
-            // Fallback only as last resort
-            'videos/welcome.mp4'
-          ]
-        : [
-            // For Netlify production environment
-            'videos/WelcomeUpdate.mp4',
-            'videos/welcome_dialogue.mp4',
-            // If we detected Netlify, add absolute URL as well (only in production)
-            ...(netlifyDomain ? [`${netlifyDomain}/videos/WelcomeUpdate.mp4`] : []),
-            // Fallback only as last resort
-            'videos/welcome.mp4'
-          ];
-      
-      console.log('Setting up video sequence with paths:', videos);
-      const overlays = {
-        [videos[0]]: {
-          text: [],
-          buttons: [
-            {
-              text: "Begin Training",
-              timing: { start: 8 },
-              action: "COMPLETE"
-            }
-          ]
-        }
-      };
-      
-      // Apply the same overlay configuration to all video paths
-      videos.forEach(videoPath => {
-        if (!overlays[videoPath]) {
-          overlays[videoPath] = overlays[videos[0]];
-        }
-      });
-      
-      console.log("Starting video sequence with paths:", videos);
-      setVideoSequence(videos, overlays);
-      setShowVideoSequence(true);
-    } catch (error) {
-      console.error("Error starting story:", error);
-      // Fallback in case of setup issues
-      if (user) {
-        setUser({
-          ...user,
-          currentNodeId: 'experience'
-        });
-        setQuizState('DIALOGUE');
-      }
-    }
+    console.log("Starting story video sequence");
+    // Use local video paths
+    setVideoSequence([
+      'videos/WelcomeUpdate_h264.mp4',
+      'videos/welcome_dialogue_h264.mp4'
+    ]);
+    setShowVideoSequence(true);
   };
 
-  // If showing video sequence, render the VideoSceneSequence component
-  if (showVideoSequence) {
-    return (
-      <StoryErrorBoundary 
-        fallback={
-          <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 text-white">
-            <div className="text-center p-8 max-w-md">
-              <h2 className="text-2xl font-bold mb-4">Unable to play introduction video</h2>
-              <p className="mb-6">We encountered an issue with the training video. You can continue with the training without it.</p>
-              <button 
-                onClick={() => {
-                  setShowVideoSequence(false);
-                  setUser({
-                    ...user,
-                    currentNodeId: 'experience'
-                  });
-                  setQuizState('DIALOGUE');
-                }}
-                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
-              >
-                Continue to Training
-              </button>
-            </div>
-          </div>
-        }
-      >
-        <VideoSceneSequence
-          onComplete={() => {
-            setShowVideoSequence(false);
-            // Go directly to dialogue without showing the welcome node again
-            setUser({
-              ...user,
-              currentNodeId: 'experience' // Skip welcome node and go directly to experience
-            });
-            setQuizState('DIALOGUE');
-          }}
-          onError={() => {
-            console.error("Video loading error - skipping to dialogue");
-            setShowVideoSequence(false);
-            setUser({
-              ...user,
-              currentNodeId: 'experience' // Skip welcome node and go directly to experience
-            });
-            setQuizState('DIALOGUE');
-          }}
-        />
-      </StoryErrorBoundary>
-    );
-  }
+  // Function to handle completion of video sequence
+  const handleVideoSequenceComplete = () => {
+    console.log("Video sequence completed, moving to first story node");
+    setShowVideoSequence(false);
+    // Start with the first scene/dialogue after videos
+    setUser({
+      ...user,
+      currentSceneIndex: 0,
+      currentDialogueIndex: 0
+    });
+    // Proceed to dialogue or first node
+    // In a full implementation, you'd go to DialogueModule or similar
+    // For now, we'll just go back to MODE_SELECT
+    setQuizState('DIALOGUE');
+  };
 
   // Course features data
   const courseFeatures = [
@@ -339,6 +241,20 @@ export const StoryQuiz: React.FC = () => {
       avatar: "/avatars/testimonial2.png" 
     }
   ];
+
+  // Near the end of the component, before the closing return
+  // Render video sequence when active
+  if (showVideoSequence) {
+    return (
+      <VideoSceneSequence
+        onComplete={handleVideoSequenceComplete}
+        onError={() => {
+          console.error("Error playing video sequence");
+          handleVideoSequenceComplete();
+        }}
+      />
+    );
+  }
 
   return (
     <motion.div

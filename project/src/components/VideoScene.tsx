@@ -44,13 +44,17 @@ export const VideoScene: React.FC<VideoSceneProps> = ({
 
   // If using YouTube, we handle things differently
   if (useYouTube) {
+    console.log('Using YouTube player with video ID:', source);
     return (
       <div className="relative w-full h-screen bg-black">
         <YouTubePlayer
           videoId={source}
-          onEnd={onComplete}
+          onEnd={() => {
+            console.log('YouTube video ended or skipped - calling onComplete callback');
+            onComplete();
+          }}
           autoplay={true}
-          muted={true}
+          muted={false}
         />
         
         {/* Overlay Container for YouTube */}
@@ -77,11 +81,14 @@ export const VideoScene: React.FC<VideoSceneProps> = ({
             </AnimatePresence>
           </div>
           
-          {/* Skip Button (remains clickable) */}
+          {/* Skip Button (ensures it's clickable) */}
           <div className="flex justify-end pointer-events-auto">
             <button 
-              onClick={onComplete}
-              className="px-4 py-2 bg-blue-600/70 rounded hover:bg-blue-700 text-white transition-colors"
+              onClick={() => {
+                console.log('Skip button clicked - calling onComplete callback');
+                onComplete();
+              }}
+              className="px-4 py-2 bg-blue-600/70 rounded hover:bg-blue-700 text-white transition-colors z-50"
             >
               Skip
             </button>

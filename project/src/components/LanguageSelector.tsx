@@ -79,10 +79,22 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   const elevenLabs = ElevenLabsService.getInstance();
 
   const handleLanguageSelect = async (language: Language) => {
-    // Preview the voice before changing
+    // Skip voice preview due to API issues
+    console.log('Selecting language:', language);
+    
+    // Temporarily animate as if we're previewing
     setIsPreviewing(true);
     setPreviewLanguage(language);
     
+    // Wait a moment for visual feedback, then select the language
+    setTimeout(() => {
+      setIsPreviewing(false);
+      setPreviewLanguage(null);
+      onSelect(language);
+    }, 500);
+    
+    // Commented out voice preview functionality due to API issues
+    /*
     try {
       const previewAudio = await elevenLabs.previewVoice(language);
       if (previewAudio) {
@@ -101,6 +113,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
       setPreviewLanguage(null);
       onSelect(language);
     }
+    */
   };
 
   // Default list of all supported languages
@@ -198,7 +211,6 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
                     <span></span>
                     <span></span>
                   </div>
-                  <span className="text-white font-medium">Previewing voice...</span>
                 </div>
               </motion.div>
             )}
